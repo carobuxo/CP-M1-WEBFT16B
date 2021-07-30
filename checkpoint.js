@@ -39,7 +39,17 @@ const {
 
 var isAncestor = function(genealogyTree, ancestor, descendant){
   // Tu código aca:
-
+  for (const item in genealogyTree) {
+    if (genealogyTree[ancestor].length === 0) return false;
+    if (ancestor === item) {
+      for (let i = 0; i < genealogyTree[ancestor].length; i++) {
+        let temp = genealogyTree[ancestor][i];
+        if (temp === descendant) return true;
+        if (genealogyTree[temp].length > 0) return isAncestor(genealogyTree, temp, descendant);
+      }
+    } 
+  }
+  return false;
 }
 
 
@@ -85,7 +95,7 @@ function secuenciaHenry(obj, n) {
 // ----- LinkedList -----
 
 // EJERCICIO 3
-// Implementar el método size dentro del prototype de LinkedList que deberá retornar el tamaño actual de
+// Implementar el método size dentro del prototype de LinkedList que deberá retornar el tamaño current de
 // la LinkedList. En el caso de que la lista se encuentre vacía deberá retornar cero.
 // Ejemplo:
 //    var lista = new LinkedList();
@@ -98,19 +108,27 @@ function secuenciaHenry(obj, n) {
 
 LinkedList.prototype.size = function(){
   // Tu código aca:
-
+if (!this.head) return 0;
+// if (!this.head.next) return 1;
+let current = this.head;
+let contador = 0;
+while(current.next){
+  contador ++;
+  current = current.next;
+  }
+  return contador + 1;
 }
 
 
 // EJERCICIO 4
 // Implementar el método switchPos dentro del prototype de LinkedList que deberá intercambiar
 // el elemento que se encuentre en pos1 con el elemento en pos2
-// En el caso de que alguna de las dos posiciones no sea válida (Supere el tamaño de la lista actual 
+// En el caso de que alguna de las dos posiciones no sea válida (Supere el tamaño de la lista current 
 // o sea un número negativo) debe devolver false.
 // Si los nodos fueron removidos correctamente devolver true.
 // Aclaración: la posición cero corresponde al head de la LinkedList
 // Ejemplo 1:
-//    Suponiendo que la lista actual es: Head --> [1] --> [2] --> [3] --> [4] --> [5]
+//    Suponiendo que la lista current es: Head --> [1] --> [2] --> [3] --> [4] --> [5]
 //    lista.switchPos(1,3);
 //    Ahora la lista quedaría: Head --> [1] --> [4] --> [3] --> [2] --> [5]
 //    y la función debería haber devuelto true
@@ -119,7 +137,23 @@ LinkedList.prototype.size = function(){
 
 LinkedList.prototype.switchPos = function(pos1, pos2){
   // Tu código aca:
-
+  let current = this.head;
+  let currentTwo = this.head;
+  if (pos1 > this.size() || pos2 > this.size() || pos1 < 0 || pos2 < 0) return false;
+  else if (this.head === null) return false;
+  else {
+    for (let i = 0; i < pos1; i++) {
+      current = current.next;
+    }
+    let temp = current.value;
+    for (let i = 0; i < pos2; i++) {
+      currentTwo = currentTwo.next;
+    }
+    let tempTwo = currentTwo.value;
+    current.value = tempTwo;
+    currentTwo.value = temp;
+    return true;
+  }
 }
 
 // EJERCICIO 5
@@ -135,7 +169,16 @@ LinkedList.prototype.switchPos = function(pos1, pos2){
 // Continuando con el nodo 2 de la lista 2, conectandose con el nodo 2 de la lista 2.
 var mergeLinkedLists = function(linkedListOne, linkedListTwo){
   // Tu código aca:
-
+  var linkedList = new LinkedList();
+  var currentOne = linkedListOne.head
+  var currentTwo = linkedListTwo.head
+  while (currentOne != null && currentTwo != null) {
+    linkedList.add(currentOne.value)
+    linkedList.add(currentTwo.value)
+    currentOne = currentOne.next;
+    currentTwo = currentTwo.next;
+  }
+  return linkedList
 }
 
 
@@ -183,7 +226,33 @@ var mergeLinkedLists = function(linkedListOne, linkedListTwo){
 
 var cardGame = function(playerOneCards, playerTwoCards){
   // Tu código aca:
-
+  var castillo1 = 100;
+  var castillo2 = 100;
+  do {
+    var cartaAtaquePlayer1 = playerOneCards.dequeue();
+    var cartaDefensaPlayer1 = playerOneCards.dequeue();
+    var cartaAtaquePlayer2 = playerTwoCards.dequeue();
+    var cartaDefensaPlayer2 = playerTwoCards.dequeue();
+    if (cartaAtaquePlayer1.attack > cartaDefensaPlayer2.defense) {
+      castillo2 -= (cartaAtaquePlayer1.attack - cartaDefensaPlayer2.defense);
+    }
+    if (cartaAtaquePlayer2.attack > cartaDefensaPlayer1.defense) {
+      castillo1 -= (cartaAtaquePlayer2.attack - cartaDefensaPlayer1.defense);
+    }
+    if (castillo1 <= 0) {
+      return 'PLAYER TWO';
+    }
+    if (castillo2 <= 0) {
+      return 'PLAYER ONE';
+    }
+  } while (playerOneCards.size() > 0);
+    if (castillo1 > castillo2) {
+      return 'PLAYER ONE';
+    } else if (castillo2 > castillo1) {
+      return 'PLAYER TWO';
+    } else {
+      return 'TIE';
+    }
 }
 
 // ---------------
@@ -207,7 +276,13 @@ var cardGame = function(playerOneCards, playerTwoCards){
 
 BinarySearchTree.prototype.height = function(){
   // Tu código aca:
-
+  if (!this.value) return 0;
+  if (this.left === null && this.right === null) return 1;
+  if (this.left === null) return 1 + this.right.height();
+  if (this.right === null) return 1 + this.left.height();
+  let left = this.left.height()
+  let right = this.right.height()
+  return 1 + Math.max(left, right)
 }
 
 
@@ -229,7 +304,24 @@ BinarySearchTree.prototype.height = function(){
 
 var binarySearch = function (array, target) {
   // Tu código aca:
+  let primero = 0;
+  let ultimo = array.length - 1;
+  let posicion = -1;
+  let encontrado = false;
+  let medio;
 
+  while (encontrado === false && primero <= ultimo) {
+    medio = Math.floor((primero + ultimo) / 2);
+    if (array[medio] == target) {
+      encontrado = true;
+      posicion = medio;
+    } else if (array[medio] > target) {
+      ultimo = medio - 1;
+    } else {
+      primero = medio + 1;
+    }
+  }
+  return posicion;
 }
 
 // EJERCICIO 9
@@ -290,7 +382,16 @@ var specialSort = function(array, orderFunction) {
 
 function closureDetect(symptoms, min) {
   // Tu código aca:
-
+  return function (person) {
+    let sintomas = 0;
+    for (let i = 0; i < symptoms.length; i++) {
+      if (symptoms.includes(person.symptoms[i])) {
+        sintomas++;
+      }
+    }
+    if (sintomas >= min) return true;
+    return false;
+  }
 }
 
 // -------------------
